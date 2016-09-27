@@ -1,0 +1,2 @@
+cd scdemo
+include main

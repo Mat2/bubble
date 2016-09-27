@@ -1,0 +1,120 @@
+actor super
+  var w            \ hitbox dimensions
+  var h
+  /cbox field ahb  \ Actor Hit Box
+  var boxx         \ typically negative
+  var boxy 
+
+  var HP           \ health points
+  var maxHP        \ max health points
+  var ATK
+  var DEF
+
+  var flip         \ allegro flip flags
+  var ang          \ angle
+  var orgx         \ display origin (normally positive, from top-left of image)
+  var orgy
+
+  var cflags
+  var cmask
+
+  var 'hit         \ ( you=other -- )
+
+  var startx var starty
+
+\  staticvar initData  \ see commonInit config below for param order.
+  staticvar 'cull
+
+extend actor
+
+include saturn/object-color
+include saturn/task
+
+
+: hit>  r> code> 'hit ! ;
+: hit   'hit @ execute ;
+
+: disporg  orgx 2v@ ;
+
+import bubble/lib/ffl-0.8.0/xml
+
+decimal
+  create lookupTbl  0 , 2 , 1 , 3 ,
+  : tmx>aflip  cells lookupTbl + @ ;
+  : /flip  decimal " gid" attr 30 >> tmx>aflip flip ! fixed ;
+  : /depth  " zdepth" ?prop -exit  zdepth +! ;
+  actor onMapLoad:  /flip /depth ;
+fixed
+
+
+\ -----------------------------------------------------------------------------
+
+\ : initData:  ( class -- <data,> ) here swap initData ! ;
+\
+\ actor initData: 16 , 16 ,
+\
+\   me class @ initData @  @+ w !  @+ h !  drop ;
+
+\ -----------------------------------------------------------------------------
+\ Zone types
+
+1
+  enum talky
+  enum interest
+  enum usable
+drop
+
+\ -----------------------------------------------------------------------------
+
+actorBit
+  bit static#
+  bit top#
+  bit bottom#
+  bit left#
+  bit right#
+to actorBit
+
+top# bottom# left# right# or or or constant hitflags#
+
+\ -----------------------------------------------------------------------------
+\ rendering stuff
+
+: showImage  ( image -- )  bmp @  x 2v@ 2af  flip @  al_draw_bitmap ;
+
+\ : af-fit  ( w h w h -- af-sx af-sy )
+\   1f rot 1f f/ 1f rot 1f f/ 2sf swap ;
+
+: fitImage  ( image -- )
+  &o for>  o bmp @  0 0 2af  o imageDims 2af  x 2v@ 2af  w 2v@ 2af  flip @
+    al_draw_scaled_bitmap ;
+
+: showSprite  ( spr# set# -- )
+  sprite>af  x 2v@ 2af  flip @   al_draw_bitmap_region ;
+
+: 4@  @+ swap @+ swap @+ swap @ ;
+
+: showSpriteT  ( spr# set# -- )
+  sprite>af
+    fcolor 4@  0 0 2af  x 2v@ 2af  1 1 2af  0 1af  flip @
+    al_draw_tinted_scaled_rotated_bitmap_region ;
+\  sprite>af
+\    fcolor 4@   x 2v@ 2af  flip @  al_draw_tinted_bitmap_region ;
+
+: showSpriteRS  ( spr# set# -- )
+  sprite>af
+    1 1 1 1 4af  disporg 2af  x 2v@ 2af  1 1 2af  ang @ radians 1af  flip @
+    al_draw_tinted_scaled_rotated_bitmap_region ;
+
+: showSpriteTRS  ( spr# set# -- )
+  sprite>af
+    fcolor 4@  disporg 2af  x 2v@ 2af  1 1 2af  ang @ radians 1af  flip @
+    al_draw_tinted_scaled_rotated_bitmap_region ;
+
+: showCbox
+  ahb cbox@ 1 1 2- 2over 2+ 4af  1 1 1 1 4af  1 1af  al_draw_rectangle ;
+
+\ -----------------------------------------------------------------------------
+\ some map data utilities
+: @dims  " width" attr " height" attr ;
+: /dims  ( -- )  @dims w 2v! ;
+
