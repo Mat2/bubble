@@ -35,13 +35,25 @@ decimal
 #define ALLEGRO_SUB_VERSION      2
 #define ALLEGRO_WIP_VERSION      0
 
-[defined] allegro5-debug [if]
-  library bubble\lib\allegro-5.2\allegro_monolith-debug-5.2.dll
+[defined] linux [if]
+    library /usr/lib/i386-linux-gnu/liballegro.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_memfile.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_primitives.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_acodec.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_audio.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_color.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_font.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_image.so.5.2
+    library /usr/lib/i386-linux-gnu/liballegro_font.so.5.2
 [else]
-  library bubble\lib\allegro-5.2\allegro_monolith-5.2.dll
-[then]
+    [defined] allegro5-debug [if]
+      library bubble/lib/allegro-5.2/allegro_monolith-debug-5.2.dll
+    [else]
+      library bubble/lib/allegro-5.2/allegro_monolith-5.2.dll
+    [then]
 
-warning off
+    warning off
+[then]
 
 ALLEGRO_VERSION 24 lshift
 ALLEGRO_SUB_VERSION 16 lshift or
@@ -55,13 +67,13 @@ constant ALLEGRO_VERSION_INT
 
 \ ----------------------------- load files --------------------------------
 
-include bubble\lib\allegro-5.2\01_allegro5_general
-include bubble\lib\allegro-5.2\02_allegro5_events
-include bubble\lib\allegro-5.2\03_allegro5_keys
-include bubble\lib\allegro-5.2\04_allegro5_audio
-include bubble\lib\allegro-5.2\05_allegro5_graphics
+include bubble/lib/allegro-5.2/01_allegro5_general
+include bubble/lib/allegro-5.2/02_allegro5_events
+include bubble/lib/allegro-5.2/03_allegro5_keys
+include bubble/lib/allegro-5.2/04_allegro5_audio
+include bubble/lib/allegro-5.2/05_allegro5_graphics
 
-include bubble\lib\allegro-5.2\tools
+include bubble/lib/allegro-5.2/tools
 
 \ =============================== END ==================================
 

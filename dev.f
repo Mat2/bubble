@@ -1,6 +1,13 @@
 empty
 
-[undefined] dev [if] true constant dev gild [then]
+
+
+[undefined] dev [if] 
+    s" envconfig.f" file-exists [if]
+        include envconfig.f
+    [then]
+    true constant dev gild 
+[then]
 
 \ include bubble/core/core
 \ include saturn/saturn

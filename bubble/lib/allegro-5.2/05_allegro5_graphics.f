@@ -157,10 +157,12 @@ function:    al_get_opengl_fbo           ( ALLEGRO_BITMAP-*bitmap -- gluint )
 function: al_set_current_opengl_context   ( ALLEGRO_DISPLAY-*display -- )
 
 \ addon: image
+library /usr/lib/i386-linux-gnu/liballegro_image.so.5.2
 function:  al_init_image_addon ( -- bool )
 function:  al_get_allegro_image_version ( -- ver )
 
 \ addon: primitives
+library /usr/lib/i386-linux-gnu/liballegro_primitives.so.5.2
 
 0
 enum ALLEGRO_PRIM_LINE_LIST
@@ -229,6 +231,8 @@ function: al_draw_filled_circle ( float-cx float-cy float-r float-r float-g floa
 function: al_draw_filled_rounded_rectangle ( float-x1 float-y1 float-x2 float-y2 float-rx float-ry float-r float-g float-b float-a -- )
 
 \ font addon
+library /usr/lib/i386-linux-gnu/liballegro_font.so.5.2
+
 function: al_init_font_addon ( -- bool )
 function: al_shutdown_font_addon ( -- )
 \ function: al_get_allegro_font_version ( -- int )
@@ -317,6 +321,8 @@ macro: rp16]   (rp) @ rp! ;
 \ : al_draw_spline                  [rp16 al_draw_spline rp16] ;
 \ : al_calculate_ribbon             [rp16 al_calculate_ribbon rp16] ;
 \ : al_calculate_arc                [rp16 al_calculate_arc rp16] ;
+
+library /usr/lib/i386-linux-gnu/liballegro_primitives.so.5.2
 
 function: al_draw_polygon  ( vertices count joinstyle r g b a thickness miterlimit -- )
 function: al_draw_filled_polygon  ( vertices count r g b a -- )

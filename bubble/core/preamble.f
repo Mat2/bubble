@@ -15,22 +15,21 @@
   [then]
 
   [undefined] idiom [if]
-    include bubble\lib\idiom
+    include bubble/lib/idiom
     : include  sp@ >r  include  r> sp@ cell+ <> ?dup if  .s abort" STACK DEPTH CHANGED" then ;
   [then]
   
   \ a directory scanner / file finder
   [undefined] qfolder [if]
-    \ uncomment for linux:
-    \ true constant linux?
-    include bubble\lib\qfolder\qfolder
+    [defined] linux [if] true constant linux? [then]
+    include bubble/lib/qfolder/qfolder
   [then]
 
   \ ffl DOM
   [UNDEFINED] ffl.version [IF]
-  include bubble\lib\ffl-0.8.0\ffl
+  include bubble/lib/ffl-0.8.0/ffl
     pushpath
-    cd bubble\lib\ffl-0.8.0
+    cd bubble/lib/ffl-0.8.0
     [undefined] dom-create [if]
         global ffling +order
         include ffl/dom.fs
@@ -44,32 +43,35 @@
   [undefined] f+ [if]
     +opt
     warning on
-    requires fpmath
+    order
+    $ ls
+\     requires fpmath
     cr .( loaded: fpmath)
   [then]
+
   
   \ Various extensions
   [undefined] 1sf [if]
-    include bubble\lib\fpext
+    include bubble/lib/fpext
     cr .( loaded: fpext)
   [then]
   [undefined] rnd [if]
     requires rnd
   [then]
   [undefined] zstring [if]
-    include bubble\lib\string-operations
+    include bubble/lib/string-operations
   [then]
   [undefined] file@ [if]
-    include bubble\lib\files
+    include bubble/lib/files
   [then]
   [undefined] fixedp [if]
     true constant fixedp
-    include bubble\lib\fixedp
+    include bubble/lib/fixedp
   [then]
   :noname [ is onSetIdiom ]  ints @ ?fixed ;
 
   [undefined] ALLEGRO_VERSION_INT [if]
-    include bubble\lib\allegro-5.2\allegro-5.2.f
+    include bubble/lib/allegro-5.2/allegro-5.2.f
   [then]
 
   \ RLD

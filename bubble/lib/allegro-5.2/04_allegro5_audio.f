@@ -1,3 +1,5 @@
+library /usr/lib/i386-linux-gnu/liballegro_acodec.so.5.2
+
 
 \ addon: codec
 function: al_init_acodec_addon ( -- bool )
@@ -21,7 +23,7 @@ function: al_get_allegro_acodec_version ( -- n )
 
 #define    ALLEGRO_CHANNEL_CONF_1   $10
 #define    ALLEGRO_CHANNEL_CONF_2   $20
-#define    ALLEGRO_CHANNEL_CONF_3   $30
+#define    ALLEGRO_CHANNEL_CONF_3   $30 
 #define    ALLEGRO_CHANNEL_CONF_4   $40
 #define    ALLEGRO_CHANNEL_CONF_5_1 $51
 #define    ALLEGRO_CHANNEL_CONF_6_1 $61

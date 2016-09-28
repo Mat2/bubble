@@ -149,37 +149,39 @@ previous definitions fixpointing +order
 \ -------- Add fixed-point interpreter to SwiftForth -------
 PACKAGE STATUS-TOOLS
 public
-: SB.BASE2  ( -- )
-  ints @ 0 = if
-    s" FIX"
-  else
-    BASE @ PSTK (.BASE)
-  then
-  1 SF-STATUS PANE-TYPE ;
-: SB.STACK2 ( -- )
-  ints @ if
-    PSTK Z(.S) ZCOUNT s[
-  else
-    s" " s[
-    DEPTH 0 >= IF
-      DEPTH 0 ?DO
-        S0 @ I 1 + CELLS - @
-        dup 0 < if s"  " +s then
-        f 3 (f.) +s
-      LOOP
-    ELSE
-      s" Underflow" +s
-    THEN
-  then
-  FDEPTH ?DUP IF
-    s"  FSTACK:" +s
-    0 DO  I' I - 1 - FPICK 3 (f.) +s  LOOP
-  THEN
-  ]s 0 SF-STATUS PANE-RIGHT ;
+[undefined] linux [if]
+    : SB.BASE2  ( -- )
+      ints @ 0 = if
+        s" FIX"
+      else
+        BASE @ PSTK (.BASE)
+      then
+      1 SF-STATUS PANE-TYPE ;
+    : SB.STACK2 ( -- )
+      ints @ if
+        PSTK Z(.S) ZCOUNT s[
+      else
+        s" " s[
+        DEPTH 0 >= IF
+          DEPTH 0 ?DO
+            S0 @ I 1 + CELLS - @
+            dup 0 < if s"  " +s then
+            f 3 (f.) +s
+          LOOP
+        ELSE
+          s" Underflow" +s
+        THEN
+      then
+      FDEPTH ?DUP IF
+        s"  FSTACK:" +s
+        0 DO  I' I - 1 - FPICK 3 (f.) +s  LOOP
+      THEN
+      ]s 0 SF-STATUS PANE-RIGHT ;
 
-: STATUS.STACK2 ( -- )    SB.BASE2  SB.STACK2 ;
+    : STATUS.STACK2 ( -- )    SB.BASE2  SB.STACK2 ;
 
-' status.stack2 is .stack
+    ' status.stack2 is .stack
+[then] \ not linux
 
 ' pnumber2? number-conversion >chain
 ' pnumber? number-conversion >chain

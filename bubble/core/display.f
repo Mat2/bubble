@@ -77,13 +77,16 @@ fixed
 
 
 \ ------------------------ words for switching windows ------------------------
-: focus  ( winapi-window - )                                                    \ force window via handle to be the active window
-  dup #1 ShowWindow drop  dup BringWindowToTop drop  SetForegroundWindow drop ;
-: >gfx  ( - )  display al_get_win_window_handle focus ;                         \ force allegro display window to take focus
-: >ide  ( - )  HWND focus ;                                                     \ force the Forth prompt to take focus
->ide
-
-
+[defined] linux [if]
+    : focus  drop ;
+    : >gfx ;  : >ide ;
+[else]
+    : focus  ( winapi-window - )                                                    \ force window via handle to be the active window
+      dup #1 ShowWindow drop  dup BringWindowToTop drop  SetForegroundWindow drop ;
+    : >gfx  ( - )  display al_get_win_window_handle focus ;                         \ force allegro display window to take focus
+    : >ide  ( - )  HWND focus ;                                                     \ force the Forth prompt to take focus
+    >ide
+[then]
 
 
 

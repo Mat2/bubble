@@ -176,7 +176,12 @@ function: al_resize_display    ( ALLEGRO_DISPLAY-*display int-width int-height -
 function: al_flip_display     ( -- )
 function: al_update_display_region ( int-x int-y int-width int-height -- )
 function: al_wait_for_vsync ( -- )
-function: al_get_win_window_handle ( ALLEGRO_DISPLAY-*display -- hwnd )
+[defined] linux [if]
+    : al_get_win_window_handle  drop 0 ;
+[else]
+    function: al_get_win_window_handle ( ALLEGRO_DISPLAY-*display -- hwnd )
+[then]
+
 function: al_set_new_display_option ( int-option, int-value, int-importance -- )
 function: al_set_new_display_flags ( int-flags -- )
 function: al_get_new_display_flags ( -- n )
@@ -198,16 +203,20 @@ function: al_set_window_title ( display name -- )
 #define  ALLEGRO_TEXTLOG_MONOSPACE        1 1 lshift
 #define  ALLEGRO_EVENT_NATIVE_DIALOG_CLOSE   600
 
-function: al_create_native_file_dialog ( char-const-*initial_path char-const-*title char-const-*patterns int-mode -- dialog )
-function: al_show_native_file_dialog ( ALLEGRO_DISPLAY-*display ALLEGRO_FILECHOOSER-*dialog -- bool )
-function: al_get_native_file_dialog_count ( const-ALLEGRO_FILECHOOSER-*dialog -- int )
-function: al_get_native_file_dialog_path ( const-ALLEGRO_FILECHOOSER-*dialog size_t-index -- addr )
-function: al_destroy_native_file_dialog ( ALLEGRO_FILECHOOSER-*dialog -- )
-function: al_show_native_message_box ( ALLEGRO_DISPLAY-*display char-const-*title char-const-*heading char-const-*text char-const-*buttons int-flags -- int )
-function: al_open_native_text_log ( char-const-*title int-flags -- log )
-function: al_close_native_text_log ( ALLEGRO_TEXTLOG-*textlog -- )
-\ function: al_append_native_text_log ( ALLEGRO_TEXTLOG-*textlog char-const-*format ... -- )
-\ function: al_get_native_text_log_event_source ( ALLEGRO_TEXTLOG-*textlog -- source )
+[defined] linux [if]
+[else]
+    function: al_create_native_file_dialog ( char-const-*initial_path char-const-*title char-const-*patterns int-mode -- dialog )
+    function: al_show_native_file_dialog ( ALLEGRO_DISPLAY-*display ALLEGRO_FILECHOOSER-*dialog -- bool )
+    function: al_get_native_file_dialog_count ( const-ALLEGRO_FILECHOOSER-*dialog -- int )
+    function: al_get_native_file_dialog_path ( const-ALLEGRO_FILECHOOSER-*dialog size_t-index -- addr )
+    function: al_destroy_native_file_dialog ( ALLEGRO_FILECHOOSER-*dialog -- )
+    function: al_show_native_message_box ( ALLEGRO_DISPLAY-*display char-const-*title char-const-*heading char-const-*text char-const-*buttons int-flags -- int )
+    function: al_open_native_text_log ( char-const-*title int-flags -- log )
+    function: al_close_native_text_log ( ALLEGRO_TEXTLOG-*textlog -- )
+    \ function: al_append_native_text_log ( ALLEGRO_TEXTLOG-*textlog char-const-*format ... -- )
+    \ function: al_get_native_text_log_event_source ( ALLEGRO_TEXTLOG-*textlog -- source )
+
+[then]
 
 \ fullscreen stuff
 function: al_get_num_display_modes ( -- n )
@@ -228,12 +237,6 @@ function: al_set_display_flag ( display flag bool -- f )
 function: al_get_display_width ( display -- w )
 function: al_get_display_height ( display -- h )
 
-function: al_create_native_file_dialog ( zinitialpath ztitle zpattern -- ALLEGRO_FILECHOOSER )
-function: al_show_native_file_dialog ( ALLEGRO_DISPLAY ALLEGRO_FILECHOOSER -- flag )
-function: al_destroy_native_file_dialog ( dialog -- )
-function: al_get_native_file_dialog_count ( dialog -- n )
-function: al_get_native_file_dialog_path ( dialog n -- zaddr )
-
 function: al_create_thread ( proc arg -- thread )
 function: al_start_thread ( thread -- )
 function: al_destroy_thread ( thread -- )
@@ -246,6 +249,8 @@ function: al_get_timer_event_source ( timer -- source )
 function: al_set_timer_count ( timer d d -- )
 
 function: al_get_display_event_source ( display -- source )
+
+library /usr/lib/i386-linux-gnu/liballegro_memfile.so.5.2
 
 function: al_open_memfile ( void-*mem, int64_t size, const-char-*mode -- ALLEGRO_FILE )
 function: al_fclose ( ALLEGRO_FILE-*f -- )

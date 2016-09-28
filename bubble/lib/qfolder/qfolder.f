@@ -7,10 +7,10 @@
 
 true constant qfolder
 
-include bubble\lib\qfolder\utilities
-[undefined] linux?   [IF]   include bubble\lib\qfolder\windows
-                     [ELSE] include bubble\lib\qfolder\linux
+include bubble/lib/qfolder/utilities
+[undefined] linux?   [IF]   include bubble/lib/qfolder/windows
+                     [ELSE] include bubble/lib/qfolder/linux
 [THEN]
-include bubble\lib\qfolder\dirwalker
-include bubble\lib\qfolder\linuxpath
-include bubble\lib\qfolder\main
+include bubble/lib/qfolder/dirwalker
+include bubble/lib/qfolder/linuxpath
+include bubble/lib/qfolder/main

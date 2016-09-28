@@ -1,8 +1,12 @@
 decimal
 : "  postpone s" ; immediate
 \ -----------------------------------------------------------------------------
-: alert  ( addr c -- )  \ show windows OS message box
-  zstring 0 swap z" Alert" MB_OK MessageBox drop ;
+[defined] linux [if]
+    : alert  type ;
+[else]
+    : alert  ( addr c -- )  \ show windows OS message box
+      zstring 0 swap z" Alert" MB_OK MessageBox drop ;
+[then]
 : --  -1 swap +! ;
 \ -----------------------------------------------------------------------------
 fixed

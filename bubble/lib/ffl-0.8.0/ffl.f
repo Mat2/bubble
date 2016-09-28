@@ -1,4 +1,4 @@
-pushpath cd bubble\lib\ffl-0.8.0
+pushpath cd bubble/lib/ffl-0.8.0
 
 wordlist constant ffling
 

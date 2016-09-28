@@ -29,7 +29,9 @@
 \ ==============================================================================
 
 [undefined] f@ [if]
+  get-order get-current only forth definitions
   requires fpmath
+  set-current set-order
 [then]
 
 [UNDEFINED] ffl.version [IF]
