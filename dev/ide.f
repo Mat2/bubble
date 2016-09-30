@@ -1,10 +1,16 @@
-defined [bub] not nip [if] include bubble/core/core [then]
+requires bubble/core/core.f
 
 [bub] idiom [ide]
 
-include bubble\lib\win-clipboard.f
+display #1280 #960 al_resize_display drop
 
-z" bubble/dev/data/consolas16.png" al_load_bitmap_font constant consolas
+
+[defined] linux [if]
+[else]
+    requires bubble/lib/win-clipboard.f
+[then]
+
+z" dev/data/consolas16.png" al_load_bitmap_font constant consolas
 
 consolas constant sysfont
 8 constant fontw
