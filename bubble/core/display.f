@@ -36,7 +36,7 @@ assertAllegro
 
 \ -------------------- starting/stopping the frame timer ----------------------
 
-: +timer  displaytimer al_start_timer ;
+: +timer  al_flip_display  displaytimer al_start_timer ;
 : -timer  displaytimer al_stop_timer ;
 
 \ ----------------------- initializing the display ----------------------------

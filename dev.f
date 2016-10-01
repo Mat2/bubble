@@ -10,5 +10,5 @@ empty
 
 \ include bubble/core/core
 \ include saturn/saturn
-\ include bubble/dev/ide  [ide] focus on
-include dumbtest/main
+include dev/ide  \ [ide] focus on
+\ include dumbtest/main

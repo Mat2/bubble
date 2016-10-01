@@ -250,7 +250,7 @@ function: al_set_timer_count ( timer d d -- )
 
 function: al_get_display_event_source ( display -- source )
 
-library /usr/lib/i386-linux-gnu/liballegro_memfile.so.5.2
+linux-library /usr/lib/i386-linux-gnu/liballegro_memfile.so.5.2
 
 function: al_open_memfile ( void-*mem, int64_t size, const-char-*mode -- ALLEGRO_FILE )
 function: al_fclose ( ALLEGRO_FILE-*f -- )

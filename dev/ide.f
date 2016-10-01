@@ -1,86 +1,48 @@
-defined [bub] not nip [if] include bubble/core/core [then]
+requires bubble/core/core.f
 
 [bub] idiom [ide]
+import bubble/modules/pen
+include dev/ide/blend
 
-include bubble\lib\win-clipboard.f
+[defined] linux [if]
 
-z" bubble/dev/data/consolas16.png" al_load_bitmap_font constant consolas
+[else]
+    requires bubble/lib/win-clipboard.f
+[then]
+
+z" dev/data/consolas16.png" al_load_bitmap_font constant consolas
 
 consolas constant sysfont
-8 constant fontw
-16 constant fonth
+8 constant fw
+16 constant fh
 
 _private
     0  xvar x  xvar y  4 cells xfield color  struct /cursor
     variable cx variable cy variable cw variable ch
 _public
 
-
-defer events    \ event handler
-defer ui        \ render UI
+variable 'go     \ game
+variable 'show   \ game
+variable 'step   \ game
 variable pause
-variable focus
+variable focus   \ true = CLI has focus
 create testbuffer #256 /allot
 create history  #256 /allot
 create ch  0 c, 0 c,
-variable lmargin  320 lmargin !
-variable rmargin  nativew 2 / rmargin !
-variable bmargin  nativeh 2 / fonth - fonth - bmargin !
-create cursor  /cursor /allot  lmargin @ cursor x !
+\ margins
+320 value lm
+: rm  displayw 2 / ;
+: bm  displayh 2 / fh 2 * - ;
+create cursor  cursor /allot  lm cursor x !
 1 1 1 1 cursor color ~!+ ~!+ ~!+ ~!+ drop
 nativew nativeh 2i al_create_bitmap value output
 variable scrolling  scrolling on
 transform baseline
 
 
-\ design:
-\  - when the IDE is loaded, we enter fullscreen and override the piston's main
-\  loop with our own which adds the UI display and event processing words.
-\  - keyboard, mouse, and joystick events can be directed either to the game,
-\  or to the UI.  when it's directed to the game, it's hidden.
-\  - the game viewport is visible at all times, scaled to a 640x480 portion
-\  of the screen.
-\  - the game can be paused.  if the audio engine is enabled, it will be suspended.
-\  - you can toggle pausing of the game's logic with CTRL+P.
-\  - ALT-ENTER has different behavior in Game mode and IDE mode.
-\      Game: toggle fullscreen and send the resize event to game (game might change the border)
-\      IDE:  toggle fullscreen and send the resize event to IDE (border stays the same)
-\  - the IDE has separate "windowed" dimensions.  GFXW and GFXH remain the game's
-\    internal resolution.  IDEW and IDEH represent what the current size of the
-\    IDE's display is.
-\  - the Listener is on the right side of the screen and uses a fixed-width
-\      font that has been derived from Consolas.  It has the following features:
-\      - Paste from clipboard (multiline)
-\      - History and Log file
-\      - Thrown errors are printed instead of shown in a window.
-\      - When an error is thrown, SIM and RENDER are turned off.
-\      - Stack and base display
-\      - Full text editing (FUTURE, precursor to apprentice/compiler/editor package)
-\            - toggle Listener/Editor mode
-\            - shift-enter inserts a line
-\            - cut, copy, paste
-\            - move by word
-\            - interpret (step) word (supporting conditionals)
-\            - browser-style navigation
-\            - jump to definition
-\            - search/replace
-\            - hide comments
-\            - "shadow" lines (80 / 80 split)
-\            - limited auto-formatting; single->double->multi, phrasing, conditional alignment
-\            - syntax coloring.  (includes defining word smartness)
 
-
-
-create oldblender  6 cells allot
-: blend  ( op src dest aop asrc adest -- )
-  oldblender dup cell+ dup cell+ dup cell+ dup cell+ dup cell+ al_get_separate_blender  al_set_separate_blender  r> call
-  oldblender @+ swap @+ swap @+ swap @+ swap @+ swap @ al_set_separate_blender ;
-
-: write-rgba  ALLEGRO_ADD ALLEGRO_ONE ALLEGRO_ZERO ALLEGRO_ADD ALLEGRO_ONE ALLEGRO_ZERO ;
-: add-rgba    ALLEGRO_ADD ALLEGRO_ONE ALLEGRO_ONE  ALLEGRO_ADD ALLEGRO_ONE ALLEGRO_ONE  ;
-: blend-rgba  ALLEGRO_ADD ALLEGRO_ALPHA ALLEGRO_INVERSE_ALPHA  ALLEGRO_ADD ALLEGRO_ONE ALLEGRO_ONE  ;
-
-blend-rgba al_set_separate_blender
+: ?call  ?dup -exit call ;
+: ?.catch  ?dup -exit .catch ;
 
 
 : recall  history count testbuffer place ;
@@ -88,15 +50,16 @@ blend-rgba al_set_separate_blender
 : typechar  testbuffer count + c!  #1 testbuffer c+! ;
 : interp    testbuffer count 2dup type space  evaluate ;
 : rub       testbuffer c@  #-1 +  0 max  testbuffer c! ;
-: ?.catch  ?dup -exit .catch ;
 : obey     store  ['] interp catch ?.catch cr testbuffer off  ;
 : paste     clpb testbuffer append ;
 
 
 \ doesn't seem to function in fullscreen.  (Allegro bug?)
-: ?pause  pause @ if  -timer  else  +timer  then ;
+: ?paused  pause @ if  -timer  else  +timer  then ;
+
 : keycode  e ALLEGRO_KEYBOARD_EVENT-keycode @ ;
 : unichar  e ALLEGRO_KEYBOARD_EVENT-unichar @ ;
+
 : special
   case
     [char] v of  paste  endof
@@ -105,19 +68,18 @@ blend-rgba al_set_separate_blender
 
 _private
   : ctrl?  e ALLEGRO_KEYBOARD_EVENT-modifiers @ ALLEGRO_KEYMOD_CTRL and ;
+  : alt?  e ALLEGRO_KEYBOARD_EVENT-modifiers @ ALLEGRO_KEYMOD_ALT and ;
 _public
 
-: ?kb
+: idekeys
   etype case
     ALLEGRO_EVENT_KEY_DOWN of
       keycode dup #37 < if  drop exit  then
       case
-      \  <F11> of  pause toggle  endof
         <tab> of  focus toggle  endof
       endcase
     endof
     ALLEGRO_EVENT_KEY_CHAR of
-
       ctrl? if
           unichar $60 + special
       else
@@ -134,24 +96,14 @@ _public
       then
     endof
   endcase
-  ;
-
-: ?resize
-  etype ALLEGRO_EVENT_DISPLAY_RESIZE = -exit
-  display al_acknowledge_resize ;
-
-: ?poll  focus @ not if  poll  else  clearkb  then ;
-: tick  ?poll ['] sim catch drop  lag ++ ;
-: tick-event  etype ALLEGRO_EVENT_TIMER = -exit  tick  ;
-: ide-events  common  ?kb  ?resize  pause @ not if  tick-event then ;
-
+;
 
 \ ----------------------------- console output --------------------------------
 
 : ?half  focus @ if 1 else 0.5 then ;
 : console  output  1 1 1 ?half  4af  at@ 2af  0  al_draw_tinted_bitmap ;
-: console-get-xy  cursor x 2v@ fontw fonth 2/ 2i ;
-: console-at-xy   2s>p fontw fonth 2* cursor x 2v! ;
+: console-get-xy  ( -- #col #row )  cursor x 2v@ fw fh 2/ 2i ;
+: console-at-xy   ( #col #row -- )  2s>p fw fh 2* cursor x 2v! ;
 
 : onto  r>  al_get_target_bitmap >r  swap al_set_target_bitmap call  r> al_set_target_bitmap ;
 
@@ -160,21 +112,28 @@ _public
   output onto  2over 2+ 1 1 2+ 4af   0 1af dup dup dup  al_draw_filled_rectangle
 ;
 
-: stack
-    0 nativeh 2 / fonth - fonth - nativew fonth clear
-    scrolling off  get-xy 2>r  0 nativeh 2 / fonth / 2 - 2i at-xy  .s  2r> at-xy  scrolling on ;
+: outputw  displayw 2 / ;
+: outputh  displayh 2 / ;
 
-: (scroll)
+
+: stack
+  lm  outputh fh - fh -   rm lm - fh   clear
+    scrolling off
+        get-xy 2>r  0 outputh fh / 2 - 2i at-xy  .s  2r> at-xy
+    scrolling on ;
+
+: scroll
+  lm  outputh fh - fh - 4 +   rm lm - fh   clear
   write-rgba blend
-  output onto  output 0 fonth negate 2af 0 al_draw_bitmap
-  fonth negate cursor y +!
+  output onto  output 0 fh negate 2af 0 al_draw_bitmap
+  fh negate cursor y +!
 ;
 
 : console-cr
-    lmargin @ cursor x !
-    fonth cursor y +!
+    lm cursor x !
+    fh cursor y +!
     scrolling @ -exit
-    cursor y @ bmargin @ >= if  (scroll)  then
+    cursor y @ bm >= if  scroll  then
 ;
 
 : 4@af  @+ swap @+ swap @+ swap @+ nip 4af ;
@@ -182,8 +141,8 @@ _public
 : (emit)
   ch c!  0 ch #1 + c!
     sysfont  cursor color 4@af  cursor x 2v@ 2af  0  ch al_draw_text
-    fontw cursor x +!
-    cursor x @ rmargin @ >= if  console-cr  then
+    fw cursor x +!
+    cursor x @ rm >= if  console-cr  then
 ;
 
 : console-emit  output onto  (emit) ;
@@ -226,24 +185,19 @@ create console-personality
 
 : framed
   cx cy cw ch al_get_clipping_rectangle
-  0 0 #640 #480 al_set_clipping_rectangle   execute
-  cx @ cy @ cw @ ch @ al_set_clipping_rectangle ;
+  0 0 #640 #480 al_set_clipping_rectangle   r> call
+  cx @ cy @ cw @ ch @ al_set_clipping_rectangle ;  ( -- <code> )
 
 : much  if 0.8 else 0.4 then ;
-: ?focusbg  simerr @ much  0.4  renerr @ much ;
+: ?focusbg  steperr @ much  0.4  showerr @ much ;
 : cls  focus @ if  ?focusbg  else  0 0.3 0  then clear-to-color ;
 
-: reindeer  ['] render catch drop ;
-: (render)  me >r  ?fs  cls  ['] reindeer framed  ui  al_flip_display  r> as ;
-
-: ?redraw
-  pause @ if
-    (render)
-  else
-    lag @ -exit  need-update? -exit  (render)  0 lag !
-  then ;
-
-: ide-frame  wait  ?pause  ['] events epump  ;
+\ : ?show
+\   pause @ if
+\     'show @ ?call
+\   else
+\     lag @ -exit  update? -exit  'show @ ?call  0 lag !
+\   then ;
 
 : /baseline
   baseline  al_identity_transform
@@ -253,34 +207,35 @@ create console-personality
 : ?_  focus @ -exit  #frames 16 and -exit  s[ [char] _ c+s ]s ;
 
 : commandline
+\  write-rgba blend
   sysfont  ?half dup dup 1 4af  at@ 2af  0  testbuffer count ?_ zstring  al_draw_text ;
 
-: ide-ui
+: ui
   /baseline
   0 0 at  console
-  320  nativeh 2 / fonth -  at  commandline
+  320  nativeh 2 / fh -  at  commandline
   stack
-  ;
-
-: ide/  fs off  previous-personality @ -exit  close-personality ;
-
-: (ok)
-  console-personality open-personality
-  ['] ide-ui is ui
-  ['] ide-events is events
-  fs on
-  go  begin ide-frame breaking? until
 ;
 
-\ Redefining GO and SHOW
+\ filter out mouse, joy, keyboard events when focused
+: thru?  focus @ if  etype ALLEGRO_EVENT_TIMER >=  else  true  then ;
+: ?clearkb  focus @ if clearkb then ;
 
-variable 'game  variable 'show
-: igo   go  ide-frame  'game @ call  show  'show @ call  ( ide stuff ) ;
-: go  r> 'game ! ;
+: ide-step  step  ?clearkb  'step @ ?call ;
+: ide-events  thru? if  'go @ ?call  then  idekeys ;
+: game  framed  'show @ ?call ;
+: ide-show  show  cls  game  ui ;
+
+: big  ( display #1280 #960 al_resize_display drop ) fs on ;
+: little  display #640 #480 al_resize_display drop  fs off ;
+: /ide  big  console-personality open-personality  go  ( ?paused )  ide-events  ide-step  ide-show ;
+: ide/  little  close-personality  ?fs  go step noop ;
+: ide  /ide  begin ok again ;  \ disable F12 (it hangs :/)
+
+\ redefine all the things
+: ok  ;
+: go  r> 'go ! ;
 : show  r> 'show ! ;
+: step  r> 'step ! ;
 
-\ thoughts
-\  formerly SIM and RENDER ... should be freely assignable
-\  every program is breakaway by virtue of having its own OK
-
-igo
+ide

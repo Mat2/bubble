@@ -16,6 +16,10 @@ create kblast  /ALLEGRO_KEYBOARD_STATE /allot  \ last frame's state
 : clearkb
   kblast /ALLEGRO_KEYBOARD_STATE erase
   kbstate /ALLEGRO_KEYBOARD_STATE erase
+;
+
+: resetkb
+  clearkb
   al_uninstall_keyboard
   al_install_keyboard  not abort" Error re-establishing the keyboard :/"
   eventq  al_get_keyboard_event_source al_register_event_source ;
