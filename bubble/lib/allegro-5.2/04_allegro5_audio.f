@@ -1,4 +1,4 @@
-library /usr/lib/i386-linux-gnu/liballegro_acodec.so.5.2
+linux-library /usr/lib/i386-linux-gnu/liballegro_acodec.so.5.2
 
 
 \ addon: codec

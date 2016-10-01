@@ -35,6 +35,10 @@ decimal
 #define ALLEGRO_SUB_VERSION      2
 #define ALLEGRO_WIP_VERSION      0
 
+[defined] linux constant linux?
+
+: linux-library  linux? if  library  else  0 parse 2drop  then ;
+
 [defined] linux [if]
     library /usr/lib/i386-linux-gnu/liballegro.so.5.2
     library /usr/lib/i386-linux-gnu/liballegro_memfile.so.5.2

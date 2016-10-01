@@ -1,6 +1,8 @@
-# Bubble-lite
+# Bubble
 
-A minimalist revision of bubble.
+A game development platform for the Forth programming language.
+
+# Revision tasklist
 
 [x] Idioms
 [x] Base libraries

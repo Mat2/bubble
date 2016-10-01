@@ -28,6 +28,7 @@
   \ ffl DOM
   [UNDEFINED] ffl.version [IF]
   include bubble/lib/ffl-0.8.0/ffl
+    $F320000 'FPOPT !  \ hopefully fixes fixed point math on linux
     pushpath
     cd bubble/lib/ffl-0.8.0
     [undefined] dom-create [if]
@@ -45,7 +46,7 @@
     warning on
     order
     $ ls
-\     requires fpmath
+\     requires fpmath  \ loaded by FFL...
     cr .( loaded: fpmath)
   [then]
 
