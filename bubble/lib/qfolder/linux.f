@@ -41,7 +41,7 @@ create cwd-buf path-length /allot
     or not
   else  zero  then ;
 
-\ LIBRARY libc.so.6
+\ linux-library libc.so.6
 
 \ LINUX: man 3 readdir
 
