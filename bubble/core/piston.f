@@ -12,19 +12,17 @@ variable fs    \ is fullscreen enabled?
 variable lag  \ completed ticks
 
 0 value me
-: as  " to me" evaluate ; immediate
 
     include bubble/core/piston-internals
 
 : ?redraw  lag @ -exit  update? -exit  ren  0 lag ! ; ( -- )
 : show  r> code> is render  ?redraw ;
-: break  true to breaking? ;
-: -break  false to breaking?  clearkb ;
+: -break  false to breaking? ;
 : go
-    -break  >gfx +timer
+    clearkb  -break  >gfx +timer
     r> code> is sim
     begin
-        wait  begin  meta  ?tick  eventq e al_get_next_event not  until
+        wait  begin  meta  ?tick  eventq e al_get_next_event not  breaking? or  until
     breaking? until
     -timer >ide  -break ;
 

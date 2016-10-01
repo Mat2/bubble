@@ -1,19 +1,19 @@
 \ piston internals
 
 : poll  pollKB  pollJoys ;
+: break  true to breaking? ; ( -- )
 
 _private
 
     : ?wpos  fs @ ?exit  display #0 #0 al_set_window_position ;
     : ?fs  display ALLEGRO_FULLSCREEN_WINDOW fs @ al_toggle_display_flag drop  ?wpos ;
-    : break  true to breaking? ; ( -- )
 
     [defined] dev [if]
         : tick  poll  ['] sim catch simerr !  lag ++ ;
-        : ren  me >r  ?fs  ['] render catch renerr !  al_flip_display  r> as ;
+        : ren  me >r  ?fs  ['] render catch renerr !  al_flip_display  r> to me ;
     [else]
         : tick  poll  sim  lag ++ ;
-        : ren  me >r  ?fs  render  al_flip_display  r> as ;
+        : ren  me >r  ?fs  render  al_flip_display  r> to me ;
     [then]
 
     : ?switch
