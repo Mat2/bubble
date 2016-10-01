@@ -226,11 +226,11 @@ create console-personality
 : game  framed  'show @ ?call ;
 : ide-show  show  cls  game  ui ;
 
-: big  display #1280 #960 al_resize_display drop  fs on ;
+: big  ( display #1280 #960 al_resize_display drop ) fs on ;
 : little  display #640 #480 al_resize_display drop  fs off ;
 : /ide  big  console-personality open-personality  go  ( ?paused )  ide-events  ide-step  ide-show ;
-: ide/  little  close-personality  ?fs  ;
-: ide  /ide  ok  ide/ ;
+: ide/  little  close-personality  ?fs  go step noop ;
+: ide  /ide  begin ok again ;  \ disable F12 (it hangs :/)
 
 \ redefine all the things
 : ok  ;
