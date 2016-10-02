@@ -227,15 +227,16 @@ create console-personality
 : ide-show  show  cls  game  ui ;
 
 : big  ( display #1280 #960 al_resize_display drop ) fs on ;
-: little  display #640 #480 al_resize_display drop  fs off ;
-: /ide  big  console-personality open-personality  go  ( ?paused )  ide-events  ide-step  ide-show ;
-: ide/  little  close-personality  ?fs  go step noop ;
-: ide  /ide  begin ok again ;  \ disable F12 (it hangs :/)
+: little  fs off  ?fs  display #640 #480 al_resize_display drop  ;
+: /ide  big  console-personality open-personality  focus on  go  ( ?paused )  ide-events  ide-step  ide-show ;
+: ide/  little  close-personality  ;
+: ide  /ide  ok  ide/ ;  
 
 \ redefine all the things
 : ok  ;
 : go  r> 'go ! ;
 : show  r> 'show ! ;
 : step  r> 'step ! ;
+: empty  close-personality  empty ;
 
 ide
