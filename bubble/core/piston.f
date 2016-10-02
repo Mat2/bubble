@@ -26,8 +26,8 @@ _private
     : ?wpos  fs @ ?exit  display #0 #0 al_set_window_position ;
     : wait  eventq e al_wait_for_event ;
     : std
-\      etype ALLEGRO_EVENT_DISPLAY_SWITCH_OUT = if  -timer  then
-      etype ALLEGRO_EVENT_DISPLAY_SWITCH_IN = if  clearkb  ( +timer ) false to alt?  then
+      etype ALLEGRO_EVENT_DISPLAY_SWITCH_OUT = if  -timer  then
+      etype ALLEGRO_EVENT_DISPLAY_SWITCH_IN = if  clearkb  +timer false to alt?  then
       etype ALLEGRO_EVENT_DISPLAY_CLOSE = if  bye  then
       etype ALLEGRO_EVENT_KEY_DOWN = if
         e ALLEGRO_KEYBOARD_EVENT-keycode @ case
@@ -59,7 +59,7 @@ _public
     begin
         wait  begin  std  'go @ ?dup if call then  ?step  eventq e al_get_next_event not  breaking? or  until
     breaking? until
-    -timer >ide  -break  r> drop  ;
+    -timer >ide  -break ;
 
 : go  r> 'go !  'step off ;
 
