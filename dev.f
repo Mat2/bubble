@@ -12,3 +12,4 @@ empty
 \ include saturn/saturn
 include dev/ide  \ [ide] focus on
 \ include dumbtest/main
+\ include stranger/stranger

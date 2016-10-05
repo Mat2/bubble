@@ -228,9 +228,11 @@ create console-personality
 
 : big  ( display #1280 #960 al_resize_display drop ) fs on ;
 : little  fs off  ?fs  display #640 #480 al_resize_display drop  ;
-: /ide  big  console-personality open-personality  focus on  go  ( ?paused )  ide-events  ide-step  ide-show ;
+: autoexec  " autoexec.f" file-exists if  " autoexec.f" included  then ; 
+: /ide  autoexec  big  console-personality open-personality  focus on  go  ( ?paused )  ide-events  ide-step  ide-show ;
 : ide/  little  close-personality  ;
 : ide  /ide  ok  ide/ ;  
+
 
 \ redefine all the things
 : ok  ;
