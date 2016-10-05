@@ -20,8 +20,6 @@ decimal
 : var  cell field ;
 : fload   include ;
 : ?constant  constant ;
-: lshift  lshift ;
-: rshift  rshift ;
 
 \ intent: speeding up some often-used short routines
 \ usage: macro:  <some code> ;  \ entire declaration must be a one-liner!
